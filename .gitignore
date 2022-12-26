@@ -1,0 +1,10 @@
+/target
+Cargo.lock
+
+*.qua
+*.qp
+*.qr
+*.osr
+*.osz
+*.osk
+*.osu
