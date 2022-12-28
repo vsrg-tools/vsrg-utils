@@ -1,4 +1,4 @@
-struct RatingProcessor {
+pub struct RatingProcessor {
     pub difficulty_rating: f32,
 }
 
