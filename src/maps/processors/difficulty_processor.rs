@@ -166,7 +166,7 @@ impl DifficultyProcessor {
             }
         }
 
-        for i in 0..self.strain_solver_data.len() - 1 {
+        for i in 0..self.strain_solver_data.len() {
             self.strain_solver_data[i].solve_finger_state();
         }
     }
@@ -178,7 +178,7 @@ impl DifficultyProcessor {
                     && self.strain_solver_data[j].start_time > self.strain_solver_data[i].start_time
                 {
                     let action_jack_found = (self.strain_solver_data[j].finger_state.bits()
-                        & (1 << self.strain_solver_data[i].finger_state.bits() - 1))
+                        & (1 << (self.strain_solver_data[i].finger_state.bits() - 1)))
                         != 0;
 
                     let action_chord_found = self.strain_solver_data[i].hand_chord
@@ -191,7 +191,6 @@ impl DifficultyProcessor {
                         - self.strain_solver_data[i].start_time;
 
                     self.strain_solver_data[i].next_strain_solver_data_on_current_hand = Some(j);
-
                     self.strain_solver_data[i].finger_action_duration_ms = action_duration;
 
                     if !action_chord_found && !action_same_state {
@@ -313,13 +312,12 @@ impl DifficultyProcessor {
                 if self.strain_solver_data[i].finger_action == FingerAction::SimpleJack
                     && next.finger_action == FingerAction::SimpleJack
                 {
-                    let duration_value = (1f32).min(
-                        0f32.max(
-                            self.strain_constants.vibro_action_duration_ms
-                                + self.strain_constants.vibro_action_tolerance_ms
-                                - self.strain_solver_data[i].finger_action_duration_ms,
-                        ) / self.strain_constants.vibro_action_tolerance_ms,
-                    );
+                    let duration_value = (1f32).min(0f32.max(
+                        (self.strain_constants.vibro_action_duration_ms
+                            + self.strain_constants.vibro_action_tolerance_ms
+                            - self.strain_solver_data[i].finger_action_duration_ms)
+                            / self.strain_constants.vibro_action_tolerance_ms,
+                    ));
 
                     let duration_multiplier =
                         1. - duration_value * (1. - self.strain_constants.vibro_multiplier);
