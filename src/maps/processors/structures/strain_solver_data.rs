@@ -1,11 +1,9 @@
-use std::{cell::RefCell, rc::Rc};
-
 use super::{FingerAction, FingerState, Hand, StrainSolverHitObject};
 
 #[derive(Default, Clone, Debug)]
 pub struct StrainSolverData {
     pub hit_objects: Vec<StrainSolverHitObject>,
-    pub next_strain_solver_data_on_current_hand: Option<Rc<RefCell<StrainSolverData>>>,
+    pub next_strain_solver_data_on_current_hand: Option<usize>,
     pub start_time: f32,
     pub end_time: f32,
     pub action_strain_coefficient: f32,
@@ -36,12 +34,6 @@ impl StrainSolverData {
         self_.hit_objects.push(hit_ob);
 
         self_
-    }
-
-    pub fn get_next(&self) -> &Rc<RefCell<Self>> {
-        self.next_strain_solver_data_on_current_hand
-            .as_ref()
-            .unwrap()
     }
 
     pub fn calculate_strain_value(&mut self) {
