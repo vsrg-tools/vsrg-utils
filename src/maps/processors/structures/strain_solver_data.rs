@@ -1,13 +1,15 @@
+use std::{cell::RefCell, rc::Rc};
+
 use super::{FingerAction, FingerState, Hand, StrainSolverHitObject};
 
 #[derive(Default, Clone, Debug)]
 pub struct StrainSolverData {
     pub hit_objects: Vec<StrainSolverHitObject>,
-    pub next_strain_solver_data_on_current_hand: Option<Box<StrainSolverData>>,
+    pub next_strain_solver_data_on_current_hand: Option<Rc<RefCell<StrainSolverData>>>,
     pub start_time: f32,
     pub end_time: f32,
     pub action_strain_coefficient: f32,
-    pub patter_strain_multiplier: f32,
+    pub pattern_strain_multiplier: f32,
     pub roll_manipulation_strain_multiplier: f32,
     pub jack_manipulation_strain_multiplier: f32,
     pub total_strain_value: f32,
@@ -22,6 +24,10 @@ pub struct StrainSolverData {
 impl StrainSolverData {
     pub fn new(hit_ob: StrainSolverHitObject, rate: Option<f32>) -> Self {
         let mut self_ = Self {
+            action_strain_coefficient: 1.,
+            pattern_strain_multiplier: 1.1,
+            roll_manipulation_strain_multiplier: 1.,
+            jack_manipulation_strain_multiplier: 1.,
             ..Default::default()
         };
 
@@ -32,10 +38,16 @@ impl StrainSolverData {
         self_
     }
 
+    pub fn get_next(&self) -> &Rc<RefCell<Self>> {
+        self.next_strain_solver_data_on_current_hand
+            .as_ref()
+            .unwrap()
+    }
+
     pub fn calculate_strain_value(&mut self) {
         for mut hit_ob in self.hit_objects.iter_mut() {
             hit_ob.strain_value = self.action_strain_coefficient
-                * self.patter_strain_multiplier
+                * self.pattern_strain_multiplier
                 * self.roll_manipulation_strain_multiplier
                 * self.jack_manipulation_strain_multiplier
                 * hit_ob.ln_strain_multiplier;

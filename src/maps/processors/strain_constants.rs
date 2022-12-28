@@ -54,7 +54,7 @@ pub struct StrainConstants {
 impl StrainConstants {
     pub fn new() -> Self {
         Self {
-            // Special Jacks
+            // Simple Jacks
             s_jack_lower_boundary_ms: 40.0,
             s_jack_upper_boundary_ms: 330.0,
             s_jack_max_strain_value: 81.0,

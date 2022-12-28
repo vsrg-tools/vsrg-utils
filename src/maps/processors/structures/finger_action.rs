@@ -1,4 +1,4 @@
-#[derive(Default, Clone, PartialEq, Eq, Debug)]
+#[derive(Default, Copy, Clone, PartialEq, Eq, Debug)]
 pub enum FingerAction {
     #[default]
     None,

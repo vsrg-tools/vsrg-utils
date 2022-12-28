@@ -14,6 +14,7 @@ impl StrainSolverHitObject {
     pub fn new(hit_ob: HitObjectInfo) -> Self {
         Self {
             hit_object: hit_ob,
+            ln_strain_multiplier: 1.,
             ..Default::default()
         }
     }
