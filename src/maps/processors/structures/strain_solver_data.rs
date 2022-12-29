@@ -15,7 +15,6 @@ pub struct StrainSolverData {
     pub finger_action: FingerAction,
     pub finger_action_duration_ms: f32,
     pub pattern: String,
-    pub hand_chord: bool,
     pub finger_state: FingerState,
 }
 
@@ -53,5 +52,9 @@ impl StrainSolverData {
         for hit_ob in self.hit_objects.iter_mut() {
             self.finger_state |= hit_ob.finger_state;
         }
+    }
+
+    pub fn hand_chord(&self) -> bool {
+        self.hit_objects.len() > 1
     }
 }

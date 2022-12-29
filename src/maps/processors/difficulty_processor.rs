@@ -23,7 +23,7 @@ pub struct DifficultyProcessor {
 }
 
 impl DifficultyProcessor {
-    pub const VERSION: &'static str = "0.0.4";
+    pub const VERSION: &'static str = "0.0.5";
 
     pub fn new(map: QuaverMap, constants: StrainConstants, mods: Option<ModIdentifier>) -> Self {
         let mut self_ = Self {
@@ -129,6 +129,7 @@ impl DifficultyProcessor {
     }
 
     fn compute_for_chords(&mut self) {
+        // had to do this because the size changes
         for i in 0.. {
             if i >= self.strain_solver_data.len() - 1 {
                 break;
@@ -166,8 +167,8 @@ impl DifficultyProcessor {
             }
         }
 
-        for i in 0..self.strain_solver_data.len() {
-            self.strain_solver_data[i].solve_finger_state();
+        for qss_data in self.strain_solver_data.iter_mut() {
+            qss_data.solve_finger_state();
         }
     }
 
@@ -177,12 +178,12 @@ impl DifficultyProcessor {
                 if self.strain_solver_data[i].hand == self.strain_solver_data[j].hand
                     && self.strain_solver_data[j].start_time > self.strain_solver_data[i].start_time
                 {
-                    let action_jack_found = (self.strain_solver_data[j].finger_state.bits()
-                        & (1 << (self.strain_solver_data[i].finger_state.bits() - 1)))
-                        != 0;
+                    let action_jack_found = (self.strain_solver_data[j].finger_state
+                        & self.strain_solver_data[i].finger_state)
+                        != FingerState::None;
 
-                    let action_chord_found = self.strain_solver_data[i].hand_chord
-                        || self.strain_solver_data[j].hand_chord;
+                    let action_chord_found = self.strain_solver_data[i].hand_chord()
+                        || self.strain_solver_data[j].hand_chord();
 
                     let action_same_state = self.strain_solver_data[i].finger_state
                         == self.strain_solver_data[j].finger_state;
@@ -267,8 +268,8 @@ impl DifficultyProcessor {
                         let duration_ratio = (self.strain_solver_data[i].finger_action_duration_ms
                             / middle.finger_action_duration_ms)
                             .max(
-                                self.strain_solver_data[i].finger_action_duration_ms
-                                    / middle.finger_action_duration_ms,
+                                middle.finger_action_duration_ms
+                                    / self.strain_solver_data[i].finger_action_duration_ms,
                             );
 
                         if duration_ratio >= self.strain_constants.roll_ratio_tolerance_ms {
@@ -345,37 +346,18 @@ impl DifficultyProcessor {
     }
 
     fn compute_for_ln_multiplier(&mut self) {
-        let short_ln_threshold = 60000. / 150. / 4.;
-        let short_ln_threshold_ceiling = 60000. / 180. / 4.;
-
         for i in 0..self.strain_solver_data.len() {
             if self.strain_solver_data[i].end_time > self.strain_solver_data[i].start_time {
                 let duration_value = 1.
-                    - (1f32).min((0f32).max(
+                    - 1f32.min(0f32.max(
                         (self.strain_constants.ln_layer_threshold_ms
                             + self.strain_constants.ln_layer_tolerance_ms
                             - (self.strain_solver_data[i].end_time
                                 - self.strain_solver_data[i].start_time))
                             / self.strain_constants.ln_layer_tolerance_ms,
                     ));
-
-                let ln_length = (self.strain_solver_data[i].end_time
-                    - self.strain_solver_data[i].start_time)
-                    .abs();
-                let mut short_ln_multiplier = 1f32;
-
-                if self.map.mode == GameMode::Keys4 {
-                    let ln_shortness = (short_ln_threshold
-                        - ln_length.max(short_ln_threshold_ceiling))
-                        / (short_ln_threshold - short_ln_threshold_ceiling);
-
-                    short_ln_multiplier = 1. - 1f32.min(0f32.max(ln_shortness));
-                }
-
-                let base_multiplier = 1.
-                    + (1. - duration_value)
-                        * self.strain_constants.ln_base_multiplier
-                        * short_ln_multiplier;
+                let base_multiplier =
+                    1. + duration_value * self.strain_constants.ln_base_multiplier;
 
                 for k in self.strain_solver_data[i].hit_objects.iter_mut() {
                     k.ln_strain_multiplier = base_multiplier;
@@ -435,10 +417,14 @@ impl DifficultyProcessor {
             .filter(|s| s.hand == Hand::Left || s.hand == Hand::Right)
             .map(|s| s.total_strain_value)
             .sum::<f32>()
-            / self.strain_solver_data.len() as f32;
+            / self
+                .strain_solver_data
+                .iter()
+                .filter(|s| s.hand == Hand::Left || s.hand == Hand::Right)
+                .count() as f32;
 
         let mut bins: Vec<f32> = Vec::new();
-        const BIN_SIZE: i32 = 1000;
+        const BIN_SIZE: i32 = 1_000;
 
         let map_start = self
             .strain_solver_data
@@ -454,7 +440,7 @@ impl DifficultyProcessor {
             .unwrap_or_default();
 
         for i in ((map_start * 100.) as i32..(map_end * 100.) as i32)
-            .step_by(BIN_SIZE as usize)
+            .step_by((BIN_SIZE * 100) as usize)
             .map(|x| x as f32 * 0.01)
         {
             let values_in_bin: Vec<_> = self
@@ -527,22 +513,21 @@ impl DifficultyProcessor {
         calculated_diff *= continuity_adjustment;
 
         const MAX_SHORT_MAP_ADJUSTMENT: f32 = 0.75;
-        const SHORT_MAP_THRESHOLD: f32 = (60 * 1000) as f32;
+        const SHORT_MAP_THRESHOLD: f32 = 60_000f32;
 
         let true_drain_time = bins.len() as f32 * continuity * BIN_SIZE as f32;
 
         let short_map_adjustment = 1f32.min(
             MAX_SHORT_MAP_ADJUSTMENT
-                .max(0.25 * (true_drain_time / SHORT_MAP_THRESHOLD) + 0.75)
-                .sqrt(),
+                .max(0.25 * (true_drain_time / SHORT_MAP_THRESHOLD).sqrt() + 0.75),
         );
 
         calculated_diff * short_map_adjustment
     }
 
-    fn compute_note_density_data(&mut self, rate: f32) -> () {
+    fn compute_note_density_data(&mut self, rate: f32) {
         self.average_note_density = 1000. * self.map.hit_objects.len() as f32
-            / (self.map.length() as f32 * (-0.5 * rate + 1.5))
+            / (self.map.length() as f32 * (-0.5 * rate + 1.5));
     }
 
     fn get_coefficient_value(
@@ -557,17 +542,15 @@ impl DifficultyProcessor {
         const DENSITY_MULTIPLIER: f32 = 0.266;
         const DENSITY_DIFFICULTY_MIN: f32 = 0.4;
 
-        let ratio = 0f32.max((duration - x_min) / (x_max - x_min));
+        let ratio = 0f32.max(1. - (duration - x_min) / (x_max - x_min));
 
-        if ratio > 1. && self.average_note_density < 4. {
+        if ratio == 0. && self.average_note_density < 4. {
             if self.average_note_density < 1. {
                 return DENSITY_DIFFICULTY_MIN;
             }
 
             return self.average_note_density * DENSITY_MULTIPLIER + 0.134;
         }
-
-        let ratio = 1. - 1f32.min(ratio);
 
         return LOWEST_DIFFICULTY + (strain_max - LOWEST_DIFFICULTY) * ratio.powf(exp);
     }
