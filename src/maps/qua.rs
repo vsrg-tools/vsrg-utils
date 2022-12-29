@@ -129,4 +129,29 @@ impl QuaverMap {
 
         actions.len() as f32 / (length as f32 / (1000. * rate))
     }
+
+    fn get_hit_object_at_judgement_index(&self, index: i32) -> Option<HitObjectInfo> {
+        let mut h: Option<HitObjectInfo> = None;
+        let mut total = 0;
+
+        for &hit_object in self.hit_objects.iter() {
+            total += 1;
+
+            if total - 1 == index {
+                h = Some(hit_object);
+                break;
+            }
+
+            if hit_object.end_time > 0 {
+                total += 1;
+            }
+
+            if total - 1 == index {
+                h = Some(hit_object);
+                break;
+            }
+        }
+
+        h
+    }
 }
