@@ -106,16 +106,17 @@ impl DifficultyProcessor {
             }
 
             let mut cur_hit_ob = StrainSolverHitObject::new(hit_object);
-            let mut cur_strain_data = StrainSolverData::new(cur_hit_ob, Some(rate));
-            // let mut cur_strain_data = StrainSolverData::new(cur_hit_ob, Some(rate));
+            let mut cur_strain_data: StrainSolverData;
 
             match self.map.mode {
                 GameMode::Keys4 => {
                     cur_hit_ob.finger_state = self.lane_to_finger_4k[&hit_object.lane];
+                    cur_strain_data = StrainSolverData::new(cur_hit_ob, Some(rate));
                     cur_strain_data.hand = self.lane_to_hand_4k[&hit_object.lane];
                 }
                 GameMode::Keys7 => {
                     cur_hit_ob.finger_state = self.lane_to_finger_7k[&hit_object.lane];
+                    cur_strain_data = StrainSolverData::new(cur_hit_ob, Some(rate));
                     cur_strain_data.hand =
                         if self.lane_to_hand_7k[&hit_object.lane] == Hand::Ambiguous {
                             assume_hand
@@ -124,6 +125,7 @@ impl DifficultyProcessor {
                         }
                 }
             }
+
             self.strain_solver_data.push(cur_strain_data);
         }
     }
@@ -424,7 +426,7 @@ impl DifficultyProcessor {
                 .count() as f32;
 
         let mut bins: Vec<f32> = Vec::new();
-        const BIN_SIZE: i32 = 1_000;
+        const BIN_SIZE: i32 = 1000;
 
         let map_start = self
             .strain_solver_data
@@ -479,10 +481,10 @@ impl DifficultyProcessor {
 
         let continuity = bins
             .iter()
-            .filter(|&&strain| strain > 0.0)
-            .map(|&strain| (strain / easy_rating_cutoff).sqrt())
+            .filter(|&&strain| strain > 0.)
+            .map(|strain| (strain / easy_rating_cutoff).sqrt())
             .sum::<f32>()
-            / bins.iter().filter(|&&strain| strain > 0.0).count() as f32;
+            / bins.iter().filter(|&&strain| strain > 0.).count() as f32;
 
         const MAX_CONTINUITY: f32 = 1.00;
         const AVG_CONTINUITY: f32 = 0.85;
@@ -496,7 +498,7 @@ impl DifficultyProcessor {
 
         if continuity > AVG_CONTINUITY {
             let continuity_factor =
-                1.0 - (continuity - AVG_CONTINUITY) / (MAX_CONTINUITY - AVG_CONTINUITY);
+                1. - (continuity - AVG_CONTINUITY) / (MAX_CONTINUITY - AVG_CONTINUITY);
             continuity_adjustment = AVG_ADJUSTMENT.min(
                 MIN_ADJUSTMENT
                     .max(continuity_factor * (AVG_ADJUSTMENT - MIN_ADJUSTMENT) + MIN_ADJUSTMENT),
@@ -513,13 +515,16 @@ impl DifficultyProcessor {
         calculated_diff *= continuity_adjustment;
 
         const MAX_SHORT_MAP_ADJUSTMENT: f32 = 0.75;
-        const SHORT_MAP_THRESHOLD: f32 = 60_000f32;
+        const SHORT_MAP_THRESHOLD: f32 = 60. * 1000.;
 
         let true_drain_time = bins.len() as f32 * continuity * BIN_SIZE as f32;
 
-        let short_map_adjustment = 1f32.min(
-            MAX_SHORT_MAP_ADJUSTMENT
-                .max(0.25 * (true_drain_time / SHORT_MAP_THRESHOLD).sqrt() + 0.75),
+        let short_map_adjustment = f32::min(
+            1.,
+            f32::max(
+                MAX_SHORT_MAP_ADJUSTMENT,
+                0.25 * f32::sqrt(true_drain_time / SHORT_MAP_THRESHOLD) + 0.75,
+            ),
         );
 
         calculated_diff * short_map_adjustment
@@ -542,7 +547,7 @@ impl DifficultyProcessor {
         const DENSITY_MULTIPLIER: f32 = 0.266;
         const DENSITY_DIFFICULTY_MIN: f32 = 0.4;
 
-        let ratio = 0f32.max(1. - (duration - x_min) / (x_max - x_min));
+        let ratio = f32::max(0., 1. - (duration - x_min) / (x_max - x_min));
 
         if ratio == 0. && self.average_note_density < 4. {
             if self.average_note_density < 1. {
@@ -552,6 +557,6 @@ impl DifficultyProcessor {
             return self.average_note_density * DENSITY_MULTIPLIER + 0.134;
         }
 
-        return LOWEST_DIFFICULTY + (strain_max - LOWEST_DIFFICULTY) * ratio.powf(exp);
+        return LOWEST_DIFFICULTY + (strain_max - LOWEST_DIFFICULTY) * f32::powf(ratio, exp);
     }
 }

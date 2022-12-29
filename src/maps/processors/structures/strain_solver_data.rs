@@ -22,7 +22,7 @@ impl StrainSolverData {
     pub fn new(hit_ob: StrainSolverHitObject, rate: Option<f32>) -> Self {
         let mut self_ = Self {
             action_strain_coefficient: 1.,
-            pattern_strain_multiplier: 1.1,
+            pattern_strain_multiplier: 1.,
             roll_manipulation_strain_multiplier: 1.,
             jack_manipulation_strain_multiplier: 1.,
             ..Default::default()
