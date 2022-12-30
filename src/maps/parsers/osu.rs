@@ -1,5 +1,5 @@
+#![allow(non_upper_case_globals)]
 use bitflags::bitflags;
-use num::clamp;
 use std::{
     fs::File,
     io::{self, BufRead},
@@ -212,17 +212,12 @@ impl OsuBeatmap {
                         self_.sound_effects.push(OsuSampleInfo {
                             start_time: values[1].parse().unwrap(),
                             layer: values[2].parse().unwrap(),
-                            volume: std::cmp::max(
-                                0,
-                                std::cmp::min(
-                                    100,
-                                    if values.len() >= 5 {
-                                        values[4].parse().unwrap()
-                                    } else {
-                                        100
-                                    },
-                                ),
-                            ),
+                            volume: (if values.len() >= 5 {
+                                values[4].parse().unwrap()
+                            } else {
+                                100
+                            })
+                            .clamp(0, 100),
                             sample: 0,
                         })
                     }
@@ -359,7 +354,7 @@ impl OsuBeatmap {
             if is_sv {
                 qua.slider_velocities.push(SliderVelocityInfo {
                     start_time: tp.offset,
-                    multiplier: clamp(-100. / tp.milliseconds_per_beat, 0.1, 10.),
+                    multiplier: (-100. / tp.milliseconds_per_beat).clamp(0.1, 10.),
                 })
             } else {
                 qua.timing_points.push(TimingPointInfo {
@@ -372,11 +367,8 @@ impl OsuBeatmap {
         }
 
         for hit_object in self.hit_objects {
-            let mut key_lane = clamp(
-                hit_object.x as f64 / (512f64 / self.key_count as f64),
-                0.,
-                (self.key_count - 1) as f64,
-            ) as i32
+            let mut key_lane = (hit_object.x as f64 / (512f64 / self.key_count as f64))
+                .clamp(0., (self.key_count - 1) as f64) as i32
                 + 1;
 
             if qua.has_scratch_key {
@@ -403,6 +395,7 @@ impl OsuBeatmap {
         qua
     }
 
+    #[allow(dead_code)]
     fn custom_audio_sample_index(&mut self, path: &str) -> i32 {
         for i in 0..self.custom_audio_samples.len() {
             if self.custom_audio_samples[i] == path {

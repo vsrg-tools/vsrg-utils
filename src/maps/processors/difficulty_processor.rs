@@ -148,23 +148,23 @@ impl DifficultyProcessor {
                     break;
                 }
 
-                if ms_diff.abs() <= self.strain_constants.chord_clump_tolerance_ms {
-                    if self.strain_solver_data[i].hand == self.strain_solver_data[j].hand {
-                        for k in self.strain_solver_data[j].hit_objects.clone() {
-                            let mut same_state_found = false;
-                            for l in self.strain_solver_data[i].hit_objects.iter() {
-                                if l.finger_state == k.finger_state {
-                                    same_state_found = true;
-                                }
-                            }
-
-                            if !same_state_found {
-                                self.strain_solver_data[i].hit_objects.push(k);
+                if ms_diff.abs() <= self.strain_constants.chord_clump_tolerance_ms
+                    && self.strain_solver_data[i].hand == self.strain_solver_data[j].hand
+                {
+                    for k in self.strain_solver_data[j].hit_objects.clone() {
+                        let mut same_state_found = false;
+                        for l in self.strain_solver_data[i].hit_objects.iter() {
+                            if l.finger_state == k.finger_state {
+                                same_state_found = true;
                             }
                         }
 
-                        self.strain_solver_data.remove(j);
+                        if !same_state_found {
+                            self.strain_solver_data[i].hit_objects.push(k);
+                        }
                     }
+
+                    self.strain_solver_data.remove(j);
                 }
             }
         }
@@ -265,34 +265,33 @@ impl DifficultyProcessor {
                     [middle.next_strain_solver_data_on_current_hand.unwrap()];
                 if self.strain_solver_data[i].finger_action == FingerAction::Roll
                     && middle.finger_action == FingerAction::Roll
+                    && self.strain_solver_data[i].finger_state == last.finger_state
                 {
-                    if self.strain_solver_data[i].finger_state == last.finger_state {
-                        let duration_ratio = (self.strain_solver_data[i].finger_action_duration_ms
-                            / middle.finger_action_duration_ms)
-                            .max(
-                                middle.finger_action_duration_ms
-                                    / self.strain_solver_data[i].finger_action_duration_ms,
-                            );
+                    let duration_ratio = (self.strain_solver_data[i].finger_action_duration_ms
+                        / middle.finger_action_duration_ms)
+                        .max(
+                            middle.finger_action_duration_ms
+                                / self.strain_solver_data[i].finger_action_duration_ms,
+                        );
 
-                        if duration_ratio >= self.strain_constants.roll_ratio_tolerance_ms {
-                            let duration_multiplier = 1.
-                                / (1.
-                                    + (duration_ratio - 1.)
-                                        * self.strain_constants.roll_ratio_multiplier);
+                    if duration_ratio >= self.strain_constants.roll_ratio_tolerance_ms {
+                        let duration_multiplier = 1.
+                            / (1.
+                                + (duration_ratio - 1.)
+                                    * self.strain_constants.roll_ratio_multiplier);
 
-                            let manipulation_found_ratio = 1.
-                                - manipulation_index / self.strain_constants.roll_max_length
-                                    * (1. - self.strain_constants.roll_length_multiplier);
+                        let manipulation_found_ratio = 1.
+                            - manipulation_index / self.strain_constants.roll_max_length
+                                * (1. - self.strain_constants.roll_length_multiplier);
 
-                            self.strain_solver_data[i].roll_manipulation_strain_multiplier =
-                                duration_multiplier * manipulation_found_ratio;
+                        self.strain_solver_data[i].roll_manipulation_strain_multiplier =
+                            duration_multiplier * manipulation_found_ratio;
 
-                            manipulation_found = true;
-                            self.roll_inaccuracy_confidence += 1.;
+                        manipulation_found = true;
+                        self.roll_inaccuracy_confidence += 1.;
 
-                            if manipulation_index < self.strain_constants.roll_max_length {
-                                manipulation_index += 1.;
-                            }
+                        if manipulation_index < self.strain_constants.roll_max_length {
+                            manipulation_index += 1.;
                         }
                     }
                 }
@@ -372,32 +371,29 @@ impl DifficultyProcessor {
                     if next.start_time
                         < self.strain_solver_data[i].end_time
                             - self.strain_constants.ln_end_threshold_ms
-                    {
-                        if next.start_time
+                        && next.start_time
                             >= self.strain_solver_data[i].start_time
                                 + self.strain_constants.ln_end_threshold_ms
+                    {
+                        if next.end_time
+                            > self.strain_solver_data[i].end_time
+                                + self.strain_constants.ln_end_threshold_ms
                         {
-                            if next.end_time
-                                > self.strain_solver_data[i].end_time
-                                    + self.strain_constants.ln_end_threshold_ms
-                            {
-                                for k in self.strain_solver_data[i].hit_objects.iter_mut() {
-                                    k.ln_layer_type = LnLayerType::OutsideRelease;
-                                    k.ln_strain_multiplier *=
-                                        self.strain_constants.ln_release_after_multiplier;
-                                }
-                            } else if next.end_time > 0. {
-                                for k in self.strain_solver_data[i].hit_objects.iter_mut() {
-                                    k.ln_layer_type = LnLayerType::InsideRelease;
-                                    k.ln_strain_multiplier *=
-                                        self.strain_constants.ln_release_before_multiplier;
-                                }
-                            } else {
-                                for k in self.strain_solver_data[i].hit_objects.iter_mut() {
-                                    k.ln_layer_type = LnLayerType::InsideTap;
-                                    k.ln_strain_multiplier *=
-                                        self.strain_constants.ln_tap_multiplier;
-                                }
+                            for k in self.strain_solver_data[i].hit_objects.iter_mut() {
+                                k.ln_layer_type = LnLayerType::OutsideRelease;
+                                k.ln_strain_multiplier *=
+                                    self.strain_constants.ln_release_after_multiplier;
+                            }
+                        } else if next.end_time > 0. {
+                            for k in self.strain_solver_data[i].hit_objects.iter_mut() {
+                                k.ln_layer_type = LnLayerType::InsideRelease;
+                                k.ln_strain_multiplier *=
+                                    self.strain_constants.ln_release_before_multiplier;
+                            }
+                        } else {
+                            for k in self.strain_solver_data[i].hit_objects.iter_mut() {
+                                k.ln_layer_type = LnLayerType::InsideTap;
+                                k.ln_strain_multiplier *= self.strain_constants.ln_tap_multiplier;
                             }
                         }
                     }
@@ -494,23 +490,21 @@ impl DifficultyProcessor {
         const AVG_ADJUSTMENT: f32 = 1.00;
         const MIN_ADJUSTMENT: f32 = 0.90;
 
-        let continuity_adjustment;
-
-        if continuity > AVG_CONTINUITY {
+        let continuity_adjustment = if continuity > AVG_CONTINUITY {
             let continuity_factor =
                 1. - (continuity - AVG_CONTINUITY) / (MAX_CONTINUITY - AVG_CONTINUITY);
-            continuity_adjustment = AVG_ADJUSTMENT.min(
+            AVG_ADJUSTMENT.min(
                 MIN_ADJUSTMENT
                     .max(continuity_factor * (AVG_ADJUSTMENT - MIN_ADJUSTMENT) + MIN_ADJUSTMENT),
-            );
+            )
         } else {
             let continuity_factor =
                 1.0 - (continuity - MIN_CONTINUITY) / (AVG_CONTINUITY - MIN_CONTINUITY);
-            continuity_adjustment = MAX_ADJUSTMENT.min(
+            MAX_ADJUSTMENT.min(
                 AVG_ADJUSTMENT
                     .max(continuity_factor * (MAX_ADJUSTMENT - AVG_ADJUSTMENT) + AVG_ADJUSTMENT),
-            );
-        }
+            )
+        };
 
         calculated_diff *= continuity_adjustment;
 
@@ -519,13 +513,8 @@ impl DifficultyProcessor {
 
         let true_drain_time = bins.len() as f32 * continuity * BIN_SIZE as f32;
 
-        let short_map_adjustment = f32::min(
-            1.,
-            f32::max(
-                MAX_SHORT_MAP_ADJUSTMENT,
-                0.25 * f32::sqrt(true_drain_time / SHORT_MAP_THRESHOLD) + 0.75,
-            ),
-        );
+        let short_map_adjustment = (0.25 * f32::sqrt(true_drain_time / SHORT_MAP_THRESHOLD) + 0.75)
+            .clamp(MAX_SHORT_MAP_ADJUSTMENT, 1.);
 
         calculated_diff * short_map_adjustment
     }
@@ -557,6 +546,6 @@ impl DifficultyProcessor {
             return self.average_note_density * DENSITY_MULTIPLIER + 0.134;
         }
 
-        return LOWEST_DIFFICULTY + (strain_max - LOWEST_DIFFICULTY) * f32::powf(ratio, exp);
+        LOWEST_DIFFICULTY + (strain_max - LOWEST_DIFFICULTY) * f32::powf(ratio, exp)
     }
 }

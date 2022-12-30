@@ -67,7 +67,7 @@ impl QuaverMap {
     }
 
     pub fn length(&self) -> i32 {
-        if self.hit_objects.len() == 0 {
+        if self.hit_objects.is_empty() {
             0
         } else {
             self.hit_objects
@@ -130,6 +130,7 @@ impl QuaverMap {
         actions.len() as f32 / (length as f32 / (1000. * rate))
     }
 
+    #[allow(dead_code)]
     fn get_hit_object_at_judgement_index(&self, index: i32) -> Option<HitObjectInfo> {
         let mut h: Option<HitObjectInfo> = None;
         let mut total = 0;

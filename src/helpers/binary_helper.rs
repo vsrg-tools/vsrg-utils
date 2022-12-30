@@ -41,8 +41,8 @@ impl BinaryHelper {
         a
     }
 
-    pub fn remaining_length(&mut self) -> usize {
-        &self.length - &self.pos
+    pub fn remaining_length(&self) -> usize {
+        self.length - self.pos
     }
 
     pub fn adv(&mut self, size: usize) {

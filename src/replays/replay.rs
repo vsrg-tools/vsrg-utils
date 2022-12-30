@@ -166,9 +166,9 @@ impl QuaverReplay {
     fn group_auto_frames(
         vec: &Vec<ReplayAutoplayFrame>,
     ) -> BTreeMap<i32, Vec<ReplayAutoplayFrame>> {
-        let mut number_groups = BTreeMap::new();
+        let mut number_groups: BTreeMap<i32, Vec<ReplayAutoplayFrame>> = BTreeMap::new();
         for &n in vec {
-            number_groups.entry(n.time).or_insert(vec![]).push(n);
+            number_groups.entry(n.time).or_default().push(n);
         }
 
         number_groups

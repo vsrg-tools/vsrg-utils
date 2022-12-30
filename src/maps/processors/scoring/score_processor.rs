@@ -27,12 +27,13 @@ pub struct ScoreProcessor {
     pub current_judgements: BTreeMap<Judgement, i32>,
     pub judgement_window: HashMap<Judgement, f32>,
     pub score_count: i64,
-    player_name: String,
-    date: String,
+    pub player_name: String,
+    pub date: String,
     judgement_health_weighting: HashMap<Judgement, f32>,
 }
 
 impl ScoreProcessor {
+    #[allow(dead_code)]
     const VERSION: &'static str = "0.0.1";
 
     pub fn windows_release_multiplier() -> HashMap<Judgement, f32> {
@@ -57,7 +58,7 @@ impl ScoreProcessor {
         ])
     }
     pub fn judgement_health_weighting(&mut self) -> &mut HashMap<Judgement, f32> {
-        if self.judgement_health_weighting.len() == 0 {
+        if self.judgement_health_weighting.is_empty() {
             self.judgement_health_weighting = HashMap::from([
                 (Judgement::Marv, 0.5),
                 (Judgement::Perf, 0.4),
@@ -134,22 +135,25 @@ impl ScoreProcessor {
     }
 
     pub fn from_replay(replay: &QuaverReplay, windows: Option<JudgementWindows>) -> Self {
-        let mut self_ = Self::default();
-        self_.health = 100.;
-        self_.mods = replay.mods;
-        self_.score = replay.score as i64;
-        self_.accuracy = replay.accuracy;
-        self_.max_combo = replay.max_combo as i64;
-        self_.player_name = replay.player_name.clone();
-        self_.date = replay.date.clone();
-        self_.judgement_window = HashMap::from([
-            (Judgement::Marv, 18.),
-            (Judgement::Perf, 43.),
-            (Judgement::Great, 76.),
-            (Judgement::Good, 106.),
-            (Judgement::Okay, 127.),
-            (Judgement::Miss, 164.),
-        ]);
+        let mut self_ = Self {
+            health: 100.,
+            mods: replay.mods,
+            score: replay.score as i64,
+            accuracy: replay.accuracy,
+            max_combo: replay.max_combo as i64,
+            player_name: replay.player_name.clone(),
+            date: replay.date.clone(),
+            judgement_window: HashMap::from([
+                (Judgement::Marv, 18.),
+                (Judgement::Perf, 43.),
+                (Judgement::Great, 76.),
+                (Judgement::Good, 106.),
+                (Judgement::Okay, 127.),
+                (Judgement::Miss, 164.),
+            ]),
+            ..Default::default()
+        };
+
         self_
             .current_judgements
             .insert(Judgement::Marv, replay.count_marv);
@@ -262,7 +266,7 @@ impl ScoreProcessor {
         judgement: Judgement,
         is_long_note_release: Option<bool>,
     ) {
-        let is_long_note_release = is_long_note_release.unwrap_or(false);
+        let _is_long_note_release = is_long_note_release.unwrap_or(false);
 
         *self.current_judgements.entry(judgement).or_insert(0) += 1;
         self.accuracy = self.calculate_accuracy();
@@ -302,10 +306,7 @@ impl ScoreProcessor {
         }
 
         // Make sure the multiplier count doesn't go below 0 nor over max multiplier count.
-        self.multiplier_count = self
-            .multiplier_count
-            .max(0)
-            .min(Self::max_multiplier_count());
+        self.multiplier_count = self.multiplier_count.clamp(0, Self::max_multiplier_count());
 
         // Update multiplier index and score count.
         self.multiplier_index = (self.multiplier_count as f32
@@ -320,7 +321,7 @@ impl ScoreProcessor {
 
         // Health calculation.
         self.health += self.judgement_health_weighting()[&judgement];
-        self.health = self.health.min(100.).max(0.);
+        self.health = self.health.clamp(0., 100.);
     }
 
     fn calculate_accuracy(&self) -> f32 {

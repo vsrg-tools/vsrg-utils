@@ -3,6 +3,7 @@ pub struct RatingProcessor {
 }
 
 impl RatingProcessor {
+    #[allow(dead_code)]
     const VERSION: &'static str = "0.0.1";
 
     pub fn new(difficulty_rating: f32) -> Self {
