@@ -1,5 +1,4 @@
 #![allow(non_upper_case_globals)]
-use bitflags::bitflags;
 use std::{
     fs::File,
     io::{self, BufRead},

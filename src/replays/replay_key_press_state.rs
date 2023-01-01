@@ -1,5 +1,3 @@
-use bitflags::bitflags;
-
 macro_rules! bitmask_to_vec {
     ($inst:expr, $($bit:expr => $repr:expr),*) => {
         {
