@@ -26,6 +26,7 @@ pub struct OsuReplay {
     pub life_bar: String,
     pub time_stamp: u64,
     pub replay_data: Vec<ReplayEvent>,
+    pub replay_id: u64,
     pub rng_seed: u32,
 }
 
@@ -99,6 +100,8 @@ impl OsuReplay {
                 keys: KeyPressState::from_bits_truncate(bits),
             })
         }
+
+        self.replay_id = br.read_u64()?;
 
         Ok(())
     }
