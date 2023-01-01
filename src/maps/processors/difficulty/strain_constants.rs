@@ -1,9 +1,7 @@
 #[derive(Default, Clone)]
 pub struct StrainConstants {
-    pub ln_end_threshold_ms: f32,
+    // Other
     pub chord_clump_tolerance_ms: f32,
-    pub graph_interval_size_ms: i32,
-    pub graph_interval_offset_ms: i32,
 
     // Special Jacks
     pub s_jack_lower_boundary_ms: f32,
@@ -36,6 +34,7 @@ pub struct StrainConstants {
     pub ln_release_after_multiplier: f32,
     pub ln_release_before_multiplier: f32,
     pub ln_tap_multiplier: f32,
+    pub ln_end_threshold_ms: f32,
 
     // LongJack Manipulation
     pub vibro_action_duration_ms: f32,
@@ -101,8 +100,6 @@ impl StrainConstants {
             roll_max_length: 14.,
 
             chord_clump_tolerance_ms: 8.,
-            graph_interval_size_ms: 500,
-            graph_interval_offset_ms: 100,
         }
     }
 }

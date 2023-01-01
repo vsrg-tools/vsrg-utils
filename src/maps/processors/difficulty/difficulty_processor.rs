@@ -25,7 +25,7 @@ pub struct DifficultyProcessor {
 impl DifficultyProcessor {
     pub const VERSION: &'static str = "0.0.5";
 
-    pub fn new(map: QuaverMap, constants: StrainConstants, mods: Option<ModIdentifier>) -> Self {
+    pub fn new(map: &QuaverMap, constants: StrainConstants, mods: Option<ModIdentifier>) -> Self {
         let mut self_ = Self {
             lane_to_hand_4k: HashMap::from([
                 (1, Hand::Left),
@@ -61,7 +61,7 @@ impl DifficultyProcessor {
         };
 
         self_.strain_constants = constants;
-        self_.map = map;
+        self_.map = map.clone();
 
         if self_.map.hit_objects.len() < 2 {
             return self_;
