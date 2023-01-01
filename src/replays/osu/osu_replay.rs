@@ -25,7 +25,7 @@ pub struct OsuReplay {
     pub mods: ModIdentifier,
     pub life_bar: String,
     pub time_stamp: u64,
-    pub frames: Vec<ReplayFrame>,
+    pub replay_data: Vec<ReplayEvent>,
     pub rng_seed: u32,
 }
 
@@ -76,26 +76,26 @@ impl OsuReplay {
         let mut decomp: Vec<u8> = Vec::new();
         lzma_decompress(&mut remaining_bytes, &mut decomp).unwrap();
 
-        let frames: Vec<&str> = std::str::from_utf8(&decomp)
+        let events: Vec<&str> = std::str::from_utf8(&decomp)
             .unwrap()
             .split(",")
             .filter(|i| !i.is_empty())
             .collect();
 
-        for (i, frame) in frames.iter().enumerate() {
-            let frame_split: Vec<&str> = frame.split("|").collect();
+        for (i, event) in events.iter().enumerate() {
+            let event_split: Vec<&str> = event.split("|").collect();
 
-            let time_delta: i64 = frame_split[0].parse().unwrap();
+            let time_delta: i64 = event_split[0].parse().unwrap();
 
-            if time_delta == -12345 && i == frames.len() - 1 {
-                self.rng_seed = frame_split[3].parse().unwrap();
+            if time_delta == -12345 && i == event.len() - 1 {
+                self.rng_seed = event_split[3].parse().unwrap();
                 continue;
             }
 
-            let bits: u32 = frame_split[1].parse().unwrap();
+            let bits: u32 = event_split[1].parse().unwrap();
 
-            self.frames.push(ReplayFrame {
-                time_delta: frame_split[0].parse().unwrap(),
+            self.replay_data.push(ReplayEvent {
+                time_delta,
                 keys: KeyPressState::from_bits_truncate(bits),
             })
         }
@@ -105,7 +105,7 @@ impl OsuReplay {
 }
 
 #[derive(Default, Debug)]
-pub struct ReplayFrame {
+pub struct ReplayEvent {
     pub time_delta: i64,
     pub keys: KeyPressState,
 }
