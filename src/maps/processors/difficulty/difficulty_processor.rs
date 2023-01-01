@@ -1,4 +1,4 @@
-use crate::enums::{GameMode, ModIdentifier};
+use crate::enums::{GameMode, ModIdentifier, QssPatternFlags};
 use crate::maps::QuaverMap;
 use std::collections::HashMap;
 
@@ -11,6 +11,7 @@ use super::StrainConstants;
 pub struct DifficultyProcessor {
     pub map: QuaverMap,
     pub overall_difficulty: f32,
+    pub qss_pattern_flags: QssPatternFlags,
     pub strain_constants: StrainConstants,
     pub average_note_density: f32,
     pub strain_solver_data: Vec<StrainSolverData>,
@@ -25,7 +26,12 @@ pub struct DifficultyProcessor {
 impl DifficultyProcessor {
     pub const VERSION: &'static str = "0.0.5";
 
-    pub fn new(map: &QuaverMap, constants: StrainConstants, mods: Option<ModIdentifier>) -> Self {
+    pub fn new(
+        map: &QuaverMap,
+        constants: StrainConstants,
+        mods: Option<ModIdentifier>,
+        detailed_solve: Option<bool>,
+    ) -> Self {
         let mut self_ = Self {
             lane_to_hand_4k: HashMap::from([
                 (1, Hand::Left),
@@ -68,6 +74,10 @@ impl DifficultyProcessor {
         }
 
         self_.calculate_difficulty(mods.unwrap_or(ModIdentifier::None));
+
+        if detailed_solve.unwrap_or_default() {
+            self_.compute_for_pattern_flags();
+        }
 
         self_
     }
@@ -399,6 +409,16 @@ impl DifficultyProcessor {
                     }
                 }
             }
+        }
+    }
+
+    fn compute_for_pattern_flags(&mut self) {
+        if self.vibro_inaccuracy_confidence / self.strain_solver_data.len() as f32 > 0.10 {
+            self.qss_pattern_flags |= QssPatternFlags::SimpleVibro;
+        }
+
+        if self.roll_inaccuracy_confidence / self.strain_solver_data.len() as f32 > 0.15 {
+            self.qss_pattern_flags |= QssPatternFlags::Rolls;
         }
     }
 
