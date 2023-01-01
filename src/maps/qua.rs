@@ -1,5 +1,5 @@
 use super::structures::*;
-use crate::enums::GameMode;
+use crate::enums::quaver::GameMode;
 
 use serde::{Deserialize, Serialize};
 

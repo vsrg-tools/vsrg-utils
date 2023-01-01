@@ -5,7 +5,7 @@ use std::{
     path::Path,
 };
 
-use crate::enums::GameMode;
+use crate::enums::quaver::GameMode;
 use crate::maps::structures::*;
 use crate::maps::QuaverMap;
 

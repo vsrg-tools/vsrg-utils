@@ -1,9 +1,5 @@
-mod replay;
-mod replay_autoplay_frame;
-mod replay_frame;
-mod replay_key_press_state;
+mod osu;
+mod quaver;
 
-pub use replay::*;
-pub use replay_autoplay_frame::*;
-pub use replay_frame::*;
-pub use replay_key_press_state::*;
+pub use osu::OsuReplay;
+pub use quaver::QuaverReplay;

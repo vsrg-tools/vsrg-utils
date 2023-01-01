@@ -1,4 +1,4 @@
-use crate::enums::{GameMode, ModIdentifier, QssPatternFlags};
+use crate::enums::quaver::{GameMode, ModIdentifier, QssPatternFlags};
 use crate::maps::QuaverMap;
 use std::collections::HashMap;
 

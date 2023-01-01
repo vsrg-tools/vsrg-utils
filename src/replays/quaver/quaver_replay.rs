@@ -1,5 +1,5 @@
 use super::{ReplayAutoplayFrame, ReplayAutoplayFrameType, ReplayFrame, ReplayKeyPressState};
-use crate::{enums::ModIdentifier, helpers::BinaryHelper, maps::QuaverMap};
+use crate::{enums::quaver::ModIdentifier, helpers::BinaryHelper, maps::QuaverMap};
 use lzma_rs::lzma_decompress;
 use semver::Version;
 use std::collections::BTreeMap;
@@ -37,11 +37,11 @@ impl QuaverReplay {
         let data = fs::read(path).unwrap();
         let mut br = BinaryHelper::from_u8(&data);
 
-        self_.replay_version = br.read_string();
-        self_.map_md5 = br.read_string();
-        self_.md5 = br.read_string();
-        self_.player_name = br.read_string();
-        self_.date = br.read_string();
+        self_.replay_version = br.read_string().unwrap();
+        self_.map_md5 = br.read_string().unwrap();
+        self_.md5 = br.read_string().unwrap();
+        self_.player_name = br.read_string().unwrap();
+        self_.date = br.read_string().unwrap();
         self_.time_played = br.read_i64().unwrap();
         self_.mode = br.read_i32().unwrap();
 

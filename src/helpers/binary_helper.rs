@@ -67,15 +67,27 @@ impl BinaryHelper {
         Ok(data)
     }
 
-    pub fn read_string(&mut self) -> String {
-        let length = self.read_7bit_encoded_int();
+    pub fn read_string(&mut self) -> std::io::Result<String> {
+        let length = self.read_7bit_encoded_int()?;
         let vec = self.read(length as usize).unwrap();
-        std::str::from_utf8(vec).unwrap().to_string()
+        Ok(std::str::from_utf8(vec).unwrap().to_string())
     }
 
-    pub fn read_7bit_encoded_int(&mut self) -> u8 {
+    pub fn read_osu_string(&mut self) -> std::io::Result<String> {
+        let b: u8 = self.read_bytes(1).unwrap()[0];
+        let length = if b == 0x0b {
+            self.read_7bit_encoded_int()?
+        } else {
+            0
+        };
+
+        let vec = self.read(length as usize).unwrap();
+        Ok(std::str::from_utf8(vec).unwrap().to_string())
+    }
+
+    fn read_7bit_encoded_int(&mut self) -> std::io::Result<u8> {
         let mut count: u8 = 0;
-        let mut shift: i32 = 0;
+        let mut shift: u8 = 0;
         let b: u8 = self.data[self.pos];
         loop {
             count |= (b & 0x7F) << shift;
@@ -86,7 +98,7 @@ impl BinaryHelper {
                 break;
             };
         }
-        count
+        Ok(count)
     }
 
     read_integer!(read_i8, i8);

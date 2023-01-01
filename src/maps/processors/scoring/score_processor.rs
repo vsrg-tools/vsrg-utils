@@ -1,7 +1,7 @@
 use num_traits::cast::FromPrimitive;
 use std::collections::{BTreeMap, HashMap};
 
-use crate::{enums::ModIdentifier, maps::QuaverMap, replays::QuaverReplay};
+use crate::{enums::quaver::ModIdentifier, maps::QuaverMap, replays::QuaverReplay};
 
 use super::{
     data::{HitStat, KeyPressType},

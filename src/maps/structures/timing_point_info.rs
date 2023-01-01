@@ -1,4 +1,4 @@
-use crate::enums::TimeSignature;
+use crate::enums::quaver::TimeSignature;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug)]
