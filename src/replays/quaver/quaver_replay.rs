@@ -105,7 +105,7 @@ impl QuaverReplay {
         self_
     }
 
-    pub fn generate_perfect_replay_keys(map: &mut QuaverMap) -> QuaverReplay {
+    pub fn generate_perfect_replay_keys(map: &QuaverMap) -> QuaverReplay {
         let mut non_combined: Vec<ReplayAutoplayFrame> = Vec::new();
         let mut replay = QuaverReplay::default();
 
