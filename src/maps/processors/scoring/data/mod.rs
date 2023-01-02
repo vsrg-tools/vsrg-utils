@@ -15,6 +15,7 @@ pub struct HitStat {
 }
 
 impl HitStat {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         type_: HitStatType,
         key_press_type: KeyPressType,

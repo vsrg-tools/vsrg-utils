@@ -9,3 +9,9 @@ pub struct HitObjectInfo {
     pub end_time: i32,
     // pub hit_sound: HitSounds,
 }
+
+impl HitObjectInfo {
+    pub fn is_long_note(&self) -> bool {
+        self.end_time > 0
+    }
+}

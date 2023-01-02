@@ -26,7 +26,7 @@ bitflags! {
         const Autoplay = 1 << 19;
         const Paused = 1 << 20;
         const NoFail = 1 << 21;
-        const NoongNotes = 1 << 22;
+        const NoLongNotes = 1 << 22;
         const Randomize = 1 << 23;
         const Speed055X = 1 << 24;
         const Speed065X = 1 << 25;
@@ -34,7 +34,7 @@ bitflags! {
         const Speed085X = 1 << 27;
         const Speed095X = 1 << 28;
         const Inverse = 1 << 29;
-        const FullN = 1 << 30;
+        const FullLN = 1 << 30;
         const Mirror = 1 << 31;
         const Coop = 1 << 32;
         const Speed105X = 1 << 33;

@@ -29,7 +29,7 @@ bitflags! {
 }
 
 impl ReplayKeyPressState {
-    pub fn to_lanes(&self) -> Vec<i32> {
+    pub fn as_lanes(&self) -> Vec<i32> {
         bitmask_to_vec!(
             self,
             ReplayKeyPressState::K1 => 0,

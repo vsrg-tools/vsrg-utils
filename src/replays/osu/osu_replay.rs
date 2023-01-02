@@ -79,12 +79,12 @@ impl OsuReplay {
 
         let events: Vec<&str> = std::str::from_utf8(&decomp)
             .unwrap()
-            .split(",")
+            .split(',')
             .filter(|i| !i.is_empty())
             .collect();
 
         for (i, event) in events.iter().enumerate() {
-            let event_split: Vec<&str> = event.split("|").collect();
+            let event_split: Vec<&str> = event.split('|').collect();
 
             let time_delta: i64 = event_split[0].parse().unwrap();
 
