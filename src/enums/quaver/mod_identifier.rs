@@ -54,72 +54,68 @@ bitflags! {
 
 impl ModIdentifier {
     pub fn get_rate_from_mods(mods: ModIdentifier) -> f32 {
-        let mut rate = 1.0f32;
-
-        if mods.contains(ModIdentifier::None) {
-            rate = 1.0
-        } else if mods.contains(ModIdentifier::Speed05X) {
-            rate = 0.5
+        if mods.contains(ModIdentifier::Speed05X) {
+            0.5
         } else if mods.contains(ModIdentifier::Speed055X) {
-            rate = 0.55
+            0.55
         } else if mods.contains(ModIdentifier::Speed06X) {
-            rate = 0.6
+            0.6
         } else if mods.contains(ModIdentifier::Speed065X) {
-            rate = 0.65
+            0.65
         } else if mods.contains(ModIdentifier::Speed07X) {
-            rate = 0.7
+            0.7
         } else if mods.contains(ModIdentifier::Speed075X) {
-            rate = 0.75
+            0.75
         } else if mods.contains(ModIdentifier::Speed08X) {
-            rate = 0.8
+            0.8
         } else if mods.contains(ModIdentifier::Speed085X) {
-            rate = 0.85
+            0.85
         } else if mods.contains(ModIdentifier::Speed09X) {
-            rate = 0.9
+            0.9
         } else if mods.contains(ModIdentifier::Speed095X) {
-            rate = 0.95
+            0.95
         } else if mods.contains(ModIdentifier::Speed105X) {
-            rate = 1.05
+            1.05
         } else if mods.contains(ModIdentifier::Speed11X) {
-            rate = 1.1
+            1.1
         } else if mods.contains(ModIdentifier::Speed115X) {
-            rate = 1.15
+            1.15
         } else if mods.contains(ModIdentifier::Speed12X) {
-            rate = 1.2
+            1.2
         } else if mods.contains(ModIdentifier::Speed125X) {
-            rate = 1.25
+            1.25
         } else if mods.contains(ModIdentifier::Speed13X) {
-            rate = 1.3
+            1.3
         } else if mods.contains(ModIdentifier::Speed135X) {
-            rate = 1.35
+            1.35
         } else if mods.contains(ModIdentifier::Speed14X) {
-            rate = 1.4
+            1.4
         } else if mods.contains(ModIdentifier::Speed145X) {
-            rate = 1.45
+            1.45
         } else if mods.contains(ModIdentifier::Speed15X) {
-            rate = 1.5
+            1.5
         } else if mods.contains(ModIdentifier::Speed155X) {
-            rate = 1.55
+            1.55
         } else if mods.contains(ModIdentifier::Speed16X) {
-            rate = 1.6
+            1.6
         } else if mods.contains(ModIdentifier::Speed165X) {
-            rate = 1.65
+            1.65
         } else if mods.contains(ModIdentifier::Speed17X) {
-            rate = 1.7
+            1.7
         } else if mods.contains(ModIdentifier::Speed175X) {
-            rate = 1.75
+            1.75
         } else if mods.contains(ModIdentifier::Speed18X) {
-            rate = 1.8
+            1.8
         } else if mods.contains(ModIdentifier::Speed185X) {
-            rate = 1.85
+            1.85
         } else if mods.contains(ModIdentifier::Speed19X) {
-            rate = 1.9
+            1.9
         } else if mods.contains(ModIdentifier::Speed195X) {
-            rate = 1.95
+            1.95
         } else if mods.contains(ModIdentifier::Speed20X) {
-            rate = 2.0
+            2.0
+        } else {
+            1.0
         }
-
-        rate
     }
 }

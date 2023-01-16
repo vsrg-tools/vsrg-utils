@@ -1,4 +1,4 @@
-#[derive(Default, Clone, Copy, PartialEq, Debug)]
+#[derive(Default, Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Hand {
     Left,
     #[default]

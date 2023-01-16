@@ -39,13 +39,13 @@ impl HitStat {
     }
 }
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Copy, Clone)]
 pub enum HitStatType {
     HIT,
     MISS,
 }
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Copy, Clone)]
 pub enum KeyPressType {
     NONE,
     PRESS,
