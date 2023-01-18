@@ -19,10 +19,10 @@ impl HitStat {
     pub fn new(
         type_: HitStatType,
         key_press_type: KeyPressType,
-        hit_difference: i32,
         hit_object: Option<HitObjectInfo>,
         song_position: Option<i32>,
         judgement: Option<Judgement>,
+        hit_difference: i32,
         accuracy: Option<f32>,
         health: Option<f32>,
     ) -> Self {
