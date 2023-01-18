@@ -127,7 +127,7 @@ impl ScoreProcessor {
             (Judgement::Miss, 0),
         ]);
         self_.initialise_judgement_windows(windows);
-        // TODO: self_.initialise_mods();
+        self_.initialise_mods();
         self_.total_judgements = self_.get_total_judgement_count();
         self_.summed_score = self_.calculate_summed_score();
         self_.initialise_health_weighting();
@@ -199,12 +199,14 @@ impl ScoreProcessor {
             .insert(Judgement::Miss, self.windows.miss);
     }
 
-    // TODO: GetRateFromMods(Mods)
-    // fn initialise_mods(&mut self) {
-    //     for i in 0..self.judgement_window.len() {
-    //         self.judgement_window[&Judgement::VALUES[i]] = GetRateFromMods(Mods);
-    //     }
-    // }
+    fn initialise_mods(&mut self) {
+        let rate = self.mods.rate();
+        for i in 0..self.judgement_window.len() {
+            self.judgement_window
+                .entry(Judgement::from_usize(i).unwrap())
+                .and_modify(|x| *x *= rate);
+        }
+    }
 
     pub fn calculate_score_from_hit_difference(
         &mut self,
@@ -377,8 +379,7 @@ impl ScoreProcessor {
             return;
         }
 
-        // TODO: get mods multiplier
-        let mut density = self.map.get_actions_per_second(None);
+        let mut density = self.map.get_actions_per_second(Some(self.mods.rate()));
 
         if density == 0. || density >= 12. || density.is_nan() {
             return;
