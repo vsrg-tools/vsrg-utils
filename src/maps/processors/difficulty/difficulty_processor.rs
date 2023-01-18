@@ -83,7 +83,7 @@ impl DifficultyProcessor {
     }
 
     fn calculate_difficulty(&mut self, mods: ModIdentifier) {
-        let rate = ModIdentifier::get_rate_from_mods(mods);
+        let rate = mods.rate();
 
         match self.map.mode {
             GameMode::Keys4 => {

@@ -53,66 +53,66 @@ bitflags! {
 }
 
 impl ModIdentifier {
-    pub fn get_rate_from_mods(mods: ModIdentifier) -> f32 {
-        if mods.contains(ModIdentifier::Speed05X) {
+    pub fn rate(&self) -> f32 {
+        if self.contains(ModIdentifier::Speed05X) {
             0.5
-        } else if mods.contains(ModIdentifier::Speed055X) {
+        } else if self.contains(ModIdentifier::Speed055X) {
             0.55
-        } else if mods.contains(ModIdentifier::Speed06X) {
+        } else if self.contains(ModIdentifier::Speed06X) {
             0.6
-        } else if mods.contains(ModIdentifier::Speed065X) {
+        } else if self.contains(ModIdentifier::Speed065X) {
             0.65
-        } else if mods.contains(ModIdentifier::Speed07X) {
+        } else if self.contains(ModIdentifier::Speed07X) {
             0.7
-        } else if mods.contains(ModIdentifier::Speed075X) {
+        } else if self.contains(ModIdentifier::Speed075X) {
             0.75
-        } else if mods.contains(ModIdentifier::Speed08X) {
+        } else if self.contains(ModIdentifier::Speed08X) {
             0.8
-        } else if mods.contains(ModIdentifier::Speed085X) {
+        } else if self.contains(ModIdentifier::Speed085X) {
             0.85
-        } else if mods.contains(ModIdentifier::Speed09X) {
+        } else if self.contains(ModIdentifier::Speed09X) {
             0.9
-        } else if mods.contains(ModIdentifier::Speed095X) {
+        } else if self.contains(ModIdentifier::Speed095X) {
             0.95
-        } else if mods.contains(ModIdentifier::Speed105X) {
+        } else if self.contains(ModIdentifier::Speed105X) {
             1.05
-        } else if mods.contains(ModIdentifier::Speed11X) {
+        } else if self.contains(ModIdentifier::Speed11X) {
             1.1
-        } else if mods.contains(ModIdentifier::Speed115X) {
+        } else if self.contains(ModIdentifier::Speed115X) {
             1.15
-        } else if mods.contains(ModIdentifier::Speed12X) {
+        } else if self.contains(ModIdentifier::Speed12X) {
             1.2
-        } else if mods.contains(ModIdentifier::Speed125X) {
+        } else if self.contains(ModIdentifier::Speed125X) {
             1.25
-        } else if mods.contains(ModIdentifier::Speed13X) {
+        } else if self.contains(ModIdentifier::Speed13X) {
             1.3
-        } else if mods.contains(ModIdentifier::Speed135X) {
+        } else if self.contains(ModIdentifier::Speed135X) {
             1.35
-        } else if mods.contains(ModIdentifier::Speed14X) {
+        } else if self.contains(ModIdentifier::Speed14X) {
             1.4
-        } else if mods.contains(ModIdentifier::Speed145X) {
+        } else if self.contains(ModIdentifier::Speed145X) {
             1.45
-        } else if mods.contains(ModIdentifier::Speed15X) {
+        } else if self.contains(ModIdentifier::Speed15X) {
             1.5
-        } else if mods.contains(ModIdentifier::Speed155X) {
+        } else if self.contains(ModIdentifier::Speed155X) {
             1.55
-        } else if mods.contains(ModIdentifier::Speed16X) {
+        } else if self.contains(ModIdentifier::Speed16X) {
             1.6
-        } else if mods.contains(ModIdentifier::Speed165X) {
+        } else if self.contains(ModIdentifier::Speed165X) {
             1.65
-        } else if mods.contains(ModIdentifier::Speed17X) {
+        } else if self.contains(ModIdentifier::Speed17X) {
             1.7
-        } else if mods.contains(ModIdentifier::Speed175X) {
+        } else if self.contains(ModIdentifier::Speed175X) {
             1.75
-        } else if mods.contains(ModIdentifier::Speed18X) {
+        } else if self.contains(ModIdentifier::Speed18X) {
             1.8
-        } else if mods.contains(ModIdentifier::Speed185X) {
+        } else if self.contains(ModIdentifier::Speed185X) {
             1.85
-        } else if mods.contains(ModIdentifier::Speed19X) {
+        } else if self.contains(ModIdentifier::Speed19X) {
             1.9
-        } else if mods.contains(ModIdentifier::Speed195X) {
+        } else if self.contains(ModIdentifier::Speed195X) {
             1.95
-        } else if mods.contains(ModIdentifier::Speed20X) {
+        } else if self.contains(ModIdentifier::Speed20X) {
             2.0
         } else {
             1.0
