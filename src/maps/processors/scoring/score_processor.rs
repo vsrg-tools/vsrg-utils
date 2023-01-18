@@ -201,10 +201,8 @@ impl ScoreProcessor {
 
     fn initialise_mods(&mut self) {
         let rate = self.mods.rate();
-        for i in 0..self.judgement_window.len() {
-            self.judgement_window
-                .entry(Judgement::from_usize(i).unwrap())
-                .and_modify(|x| *x *= rate);
+        for window in self.judgement_window.values_mut() {
+            *window *= rate;
         }
     }
 
