@@ -143,14 +143,6 @@ impl ScoreProcessor {
             max_combo: replay.max_combo as i64,
             player_name: replay.player_name.clone(),
             date: replay.date.clone(),
-            judgement_window: HashMap::from([
-                (Judgement::Marv, 18.),
-                (Judgement::Perf, 43.),
-                (Judgement::Great, 76.),
-                (Judgement::Good, 106.),
-                (Judgement::Okay, 127.),
-                (Judgement::Miss, 164.),
-            ]),
             ..Default::default()
         };
 
@@ -174,7 +166,7 @@ impl ScoreProcessor {
             .insert(Judgement::Miss, replay.count_miss);
 
         self_.initialise_judgement_windows(windows);
-        // self_.initialise_mods();
+        self_.initialise_mods();
 
         self_
     }
